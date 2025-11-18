@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            background: #f8fafc;
+            /* New charming background gradient */
+            background: radial-gradient(circle at top left, #a3c1e3, #c5d4e8, #f8fafc);
+            background-attachment: fixed;
+        }
+
+        .auth-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), inset 0 0 10px rgba(255, 255, 255, 0.5);
+            padding: 3rem 2rem;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .form-input {
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #5d9cec;
+            box-shadow: 0 0 0 3px rgba(93, 156, 236, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #5d9cec, #5e77e2);
+            color: white;
+            font-weight: bold;
+            border-radius: 0.75rem;
+            padding: 0.85rem 1.75rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 15px rgba(93, 156, 236, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(93, 156, 236, 0.5);
+        }
+
+        .link-text {
+            color: #5d9cec;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .link-text:hover {
+            color: #4a80c9;
+        }
+
+        .sign-up-mode .login-form {
+            display: none;
+        }
+        
+        .sign-up-mode .signup-form {
+            display: block;
+        }
+
+        .signup-form {
+            display: none;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #5d9cec, #5e77e2);
+            color: white;
+            border-radius: 1.5rem 1.5rem 0 0;
+            padding: 1.25rem 2.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .alphabet-card-container {
+            perspective: 1000px;
+            height: 150px;
+        }
+
+        .alphabet-card {
+            width: 0%; /* Start with 0 width */
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s, width 0.5s ease-in-out;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .alphabet-card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-front {
+            background: #fff;
+            color: #333;
+        }
+
+        .card-back {
+            background: #fff;
+            transform: rotateY(180deg);
+            padding: 0.5rem;
+        }
+        
+        .sign-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+<main id="app-container" class="w-full max-w-4xl p-4 md:p-8 bg-gray-50 rounded-2xl shadow-2xl hidden">
+    
+    <!-- Authentication View (Login/Signup) -->
+    <div id="auth-view" class="w-full h-screen sm:h-auto flex items-center justify-center">
+        <div class="auth-card">
+            <div id="login-form-container" class="login-form">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Welcome to Sign Language</h2>
+                <form id="login-form" class="flex flex-col space-y-4">
+                    <input type="email" placeholder="Email" id="login-email" class="form-input" required>
+                    <input type="password" placeholder="Password" id="login-password" class="form-input" required>
+                    <button type="submit" class="btn-primary">Log In</button>
+                    <p id="login-error" class="text-red-500 text-sm text-center mt-2"></p>
+                    <p class="text-center text-gray-600 text-sm mt-4">
+                        Don't have an account? <span id="show-signup-btn" class="link-text">Sign Up</span>
+                    </p>
+                </form>
+            </div>
+            <div id="signup-form-container" class="signup-form">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Create Your Account</h2>
+                <form id="signup-form" class="flex flex-col space-y-4">
+                    <input type="text" placeholder="Full Name" id="signup-name" class="form-input" required>
+                    <input type="email" placeholder="Email" id="signup-email" class="form-input" required>
+                    <input type="password" placeholder="Password" id="signup-password" class="form-input" required>
+                    <button type="submit" class="btn-primary">Sign Up</button>
+                    <p id="signup-error" class="text-red-500 text-sm text-center mt-2"></p>
+                    <p class="text-center text-gray-600 text-sm mt-4">
+                        Already have an account? <span id="show-login-btn" class="link-text">Log In</span>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main App View (Alphabet Guide) -->
+    <div id="app-view" class="w-full hidden">
+        <header class="app-header flex flex-col sm:flex-row justify-between items-center py-4 px-6 mb-6">
+            <h1 class="text-3xl font-bold mb-2 sm:mb-0">ASL Guide</h1>
+            <div class="flex items-center space-x-4">
+                <p id="user-id-display" class="text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full hidden sm:block"></p>
+                <button id="launch-detection-btn" class="bg-green-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">Launch Detection App</button>
+                <button id="logout-btn" class="bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">Log Out</button>
+            </div>
+        </header>
+
+        <section class="bg-white p-6 rounded-2xl shadow-lg mb-6">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4 text-center">AI-Powered Sign Generator ✨</h2>
+            <div class="flex flex-col items-center justify-center space-y-4">
+                <p class="text-lg text-gray-600 text-center">Enter a word to get an explanation and images of its sign:</p>
+                <div class="w-full flex flex-col items-center">
+                    <input type="text" id="llm-input" placeholder="e.g., hello, family, please" class="form-input text-center w-full max-w-lg mb-4">
+                    <button id="llm-generate-btn" class="btn-primary flex items-center space-x-2">
+                        <span>Generate Sign ✨</span>
+                        <div id="llm-spinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </button>
+                </div>
+                <div id="llm-output-container" class="w-full flex flex-col items-center mt-4">
+                    <div id="llm-output" class="w-full max-w-lg p-4 rounded-lg bg-gray-100 text-gray-800 text-sm">
+                        <p class="text-center text-gray-500">Your sign language explanation will appear here.</p>
+                    </div>
+                    <div id="llm-image-container" class="flex flex-wrap justify-center gap-4 mt-6">
+                        <!-- Image and Fingerspelling will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6 text-center">Click a card to see the sign!</h2>
+            <div id="alphabet-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Cards populated by JavaScript -->
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Loading Spinner -->
+<div id="loading-spinner" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-gray-600 bg-opacity-50">
+    <div class="w-16 h-16 border-4 border-t-4 border-white border-t-transparent border-solid rounded-full animate-spin"></div>
+</div>
+
+<!-- Message Modal -->
+<div id="message-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm">
+        <p id="modal-text" class="text-lg font-semibold mb-4"></p>
+        <button id="modal-close-btn" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors">OK</button>
+    </div>
+</div>
+
+<script type="module">
+    // --- Backend API setup (Node/Express + MongoDB) ---
+    const API_BASE_URL = 'http://localhost:5001/api/auth';
+    const API_URLS = [
+        'http://localhost:5001/api/auth',
+        'http://127.0.0.1:5001/api/auth',
+        'http://localhost:3000/api/auth'
+    ];
+
+    // Auth state
+    let userId = null;
+    let authToken = null;
+
+    // --- DOM Elements ---
+    const authView = document.getElementById('auth-view');
+    const appView = document.getElementById('app-view');
+    const appContainer = document.getElementById('app-container');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const showSignupBtn = document.getElementById('show-signup-btn');
+    const showLoginBtn = document.getElementById('show-login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const launchDetectionBtn = document.getElementById('launch-detection-btn');
+    const alphabetGrid = document.getElementById('alphabet-grid');
+    const llmInput = document.getElementById('llm-input');
+    const llmGenerateBtn = document.getElementById('llm-generate-btn');
+    const llmSpinner = document.getElementById('llm-spinner');
+    const llmOutput = document.getElementById('llm-output');
+    const llmImageContainer = document.getElementById('llm-image-container');
+    const loginEmailInput = document.getElementById('login-email');
+    const loginPasswordInput = document.getElementById('login-password');
+    const signupNameInput = document.getElementById('signup-name');
+    const signupEmailInput = document.getElementById('signup-email');
+    const signupPasswordInput = document.getElementById('signup-password');
+    const loginError = document.getElementById('login-error');
+    const signupError = document.getElementById('signup-error');
+    const messageModal = document.getElementById('message-modal');
+    const modalText = document.getElementById('modal-text');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const userIdDisplay = document.getElementById('user-id-display');
+
+    // Simple mapping: load images from ./Aplahabet/<LETTER>.png
+    const ASL_ALPHABET = {
+        'a': './Alphabet/A.png',
+        'b': './Alphabet/B.png',
+        'c': './Alphabet/C.png',
+        'd': './Alphabet/D.png',
+        'e': './Alphabet/E.png',
+        'f': './Alphabet/F.png',
+        'g': './Alphabet/G.png',
+        'h': './Alphabet/H.png',
+        'i': './Alphabet/I.png',
+        'j': './Alphabet/J.png',
+        'k': './Alphabet/K.png',
+        'l': './Alphabet/L.png',
+        'm': './Alphabet/M.png',
+        'n': './Alphabet/N.png',
+        'o': './Alphabet/O.png',
+        'p': './Alphabet/P.png',
+        'q': './Alphabet/Q.png',
+        'r': './Alphabet/R.png',
+        's': './Alphabet/S.png',
+        't': './Alphabet/T.png',
+        'u': './Alphabet/U.png',
+        'v': './Alphabet/V.png',
+        'w': './Alphabet/W.png',
+        'x': './Alphabet/X.png',
+        'y': './Alphabet/Y.png',
+        'z': './Alphabet/Z.png',
+    };
+    
+    // --- Functions ---
+    function showMessage(message) {
+        modalText.textContent = message;
+        messageModal.classList.remove('hidden');
+    }
+
+    function showLoading() {
+        loadingSpinner.classList.remove('hidden');
+        appContainer.classList.add('hidden');
+    }
+
+    function hideLoading() {
+        loadingSpinner.classList.add('hidden');
+        appContainer.classList.remove('hidden');
+    }
+
+    function showAuthView() {
+        authView.classList.remove('hidden');
+        appView.classList.add('hidden');
+        appContainer.classList.remove('hidden');
+    }
+
+    function showAppView(user) {
+        authView.classList.add('hidden');
+        appView.classList.remove('hidden');
+        appContainer.classList.remove('hidden');
+        if (user && (user.id || user.email)) {
+            userIdDisplay.textContent = user.email ? `User: ${user.email}` : `User ID: ${user.id}`;
+            userIdDisplay.classList.remove('hidden');
+        }
+        populateAlphabetGuide();
+    }
+
+    function populateAlphabetGuide() {
+        alphabetGrid.innerHTML = '';
+        Object.entries(ASL_ALPHABET).forEach(([letter, imageUrl]) => {
+            const card = document.createElement('div');
+            card.className = 'alphabet-card-container';
+            card.setAttribute('data-letter', letter.toUpperCase());
+            card.innerHTML = `
+                <div class="alphabet-card w-full">
+                    <div class="card-face card-front">
+                        <span class="text-6xl font-bold">${letter.toUpperCase()}</span>
+                    </div>
+                    <div class="card-face card-back">
+                        <img src="${imageUrl}" alt="Sign for ${letter}" class="sign-image">
+                    </div>
+                </div>
+            `;
+            card.addEventListener('click', () => {
+                card.querySelector('.alphabet-card').classList.toggle('is-flipped');
+            });
+            alphabetGrid.appendChild(card);
+        });
+    }
+
+    /*async function callGeminiAPI(query) {
+        const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+        const apiKey = 'AIzaSyBfcOi8CcJtlfrGHHJyZwoFFrpDtb1l_EY';
+
+        const prompt = `You are an expert on American Sign Language (ASL). Describe in a concise, step-by-step manner how to sign the word or phrase "${query}". Focus on hand shapes, movements, and facial expressions. Do not provide a letter-by-letter spelling.`;
+
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }],
+            systemInstruction: { parts: [{ text: "You are an expert ASL tutor. Be clear and helpful." }] },
+        };
+
+        const body = JSON.stringify(payload);
+
+        let retries = 0;
+        const maxRetries = 5;
+        const initialDelay = 1000;
+
+        while (retries < maxRetries) {
+            try {
+                const response = await fetch(`${endpoint}?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: body
+                });
+
+                if (response.status === 429) {
+                    retries++;
+                    const delay = initialDelay * Math.pow(2, retries - 1);
+                    await new Promise(res => setTimeout(res, delay));
+                    continue;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text || 'No explanation found.';
+
+            } catch (error) {
+                console.error('Fetch error for explanation:', error);
+                return 'Failed to get an explanation. Please try again.';
+            }
+        }
+
+        return 'Too many requests. Please try again later.';
+    }
+*/
+async function callGeminiAPI(query) {
+    try {
+        const response = await fetch("http://localhost:5001/explain", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query })
+        });
+
+        const data = await response.json();
+        return data.answer;
+    } catch (err) {
+        console.error("Frontend error:", err);
+        return "Failed to get explanation.";
+    }
+}
+
+    // --- Simple auth state based on JWT in localStorage ---
+    function checkAuthState() {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            authToken = token;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                userId = payload.userId;
+                showAppView({ id: userId });
+            } catch (error) {
+                localStorage.removeItem('authToken');
+                showAuthView();
+            }
+        } else {
+            showAuthView();
+        }
+    }
+
+    checkAuthState();
+    
+    // --- Authentication Event Listeners ---
+    showSignupBtn.addEventListener('click', () => {
+        document.body.classList.add('sign-up-mode');
+        loginError.textContent = '';
+    });
+
+    showLoginBtn.addEventListener('click', () => {
+        document.body.classList.remove('sign-up-mode');
+        signupError.textContent = '';
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+        localStorage.removeItem('authToken');
+        authToken = null;
+        userId = null;
+        showAuthView();
+        showMessage('You have been logged out.');
+    });
+
+    launchDetectionBtn.addEventListener('click', async () => {
+        try {
+            const response = await fetch('http://localhost:5001/api/launch-detection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                showMessage('Detection application launched successfully!');
+            } else {
+                showMessage(`Failed to launch detection app: ${data.message}`);
+            }
+        } catch (error) {
+            console.error('Error launching detection app:', error);
+            showMessage('Failed to launch detection app. Please check if backend is running.');
+        }
+    });
+
+    modalCloseBtn.addEventListener('click', () => {
+        messageModal.classList.add('hidden');
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = loginEmailInput.value;
+        const password = loginPasswordInput.value;
+        loginError.textContent = '';
+
+        let response;
+        let data;
+        let success = false;
+
+        for (const apiUrl of API_URLS) {
+            try {
+                response = await fetch(`${apiUrl}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                data = await response.json();
+                if (response.ok) { success = true; break; }
+            } catch (error) {
+                continue;
+            }
+        }
+
+        if (success) {
+            authToken = data.token;
+            userId = data.user.id;
+            localStorage.setItem('authToken', authToken);
+            showAppView(data.user);
+        } else {
+            loginError.textContent = data?.message || 'Login failed. Check if backend is running.';
+        }
+    });
+
+    signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = signupNameInput.value;
+        const email = signupEmailInput.value;
+        const password = signupPasswordInput.value;
+        signupError.textContent = '';
+
+        let response;
+        let data;
+        let success = false;
+
+        for (const apiUrl of API_URLS) {
+            try {
+                response = await fetch(`${apiUrl}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                data = await response.json();
+                if (response.ok) { success = true; break; }
+            } catch (error) {
+                continue;
+            }
+        }
+
+        if (success) {
+            authToken = data.token;
+            userId = data.user?.id;
+            if (authToken) localStorage.setItem('authToken', authToken);
+            showAppView(data.user || { id: userId, email });
+            showMessage('Account created and logged in successfully!');
+        } else {
+            signupError.textContent = data?.message || 'Registration failed. Check if backend is running.';
+        }
+    });
+
+    llmGenerateBtn.addEventListener('click', async () => {
+        const query = llmInput.value.trim().toLowerCase();
+        if (!query) {
+            showMessage("Please enter a word or phrase.");
+            return;
+        }
+
+        llmGenerateBtn.disabled = true;
+        llmSpinner.classList.remove('hidden');
+        llmOutput.innerHTML = '<p class="text-center text-gray-500">Generating explanation...</p>';
+        llmImageContainer.innerHTML = '';
+
+        const explanation = await callGeminiAPI(query);
+        llmOutput.innerHTML = `<p>${explanation}</p>`;
+
+        if (userId && authToken) {
+            try {
+                await fetch(`${API_BASE_URL}/queries`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`,
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        explanation: explanation,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+            } catch (error) {
+                console.error("Error saving query to backend:", error);
+            }
+        }
+
+        const words = query.split(/\s+/);
+        let totalDelay = 0;
+        const wordDelay = 1500;
+        for (const word of words) {
+            if (word) {
+                const letters = word.split('');
+                for (const char of letters) {
+                    const imageUrl = ASL_ALPHABET[char];
+                    if (imageUrl) {
+                        setTimeout(() => {
+                            const img = document.createElement('img');
+                            img.src = imageUrl;
+                            img.alt = `Sign for ${char}`;
+                            img.className = 'w-24 h-24 object-contain rounded-lg shadow-md';
+                            llmImageContainer.appendChild(img);
+                        }, totalDelay);
+                        totalDelay += 500;
+                    }
+                }
+            }
+            totalDelay += wordDelay;
+        }
+        
+        llmGenerateBtn.disabled = false;
+        llmSpinner.classList.add('hidden');
+    });
+</script>
+</body>
+</html>

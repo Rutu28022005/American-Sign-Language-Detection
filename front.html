@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Detection</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Add your custom styles here */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .camera-controls {
+            margin-bottom: 20px;
+        }
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .alphabet-letter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        .alphabet-letter img {
+            max-width: 100%;
+            height: 100px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="text-center">Sign Language Detection App</h1>
+        <div class="camera-controls">
+            <button class="btn btn-primary" onclick="launchApp()">🎬 Launch Detection App</button>
+            <button class="btn btn-secondary" onclick="captureFrame()">📸 Capture</button>
+            <button class="btn btn-secondary" onclick="clearDetection()">🗑️ Clear All</button>
+        </div>
+
+        <div class="alphabet-grid">
+            <!-- images served from /static/Alphabet/ -->
+            <div class="alphabet-letter" onclick="showLetterReference('A')">
+                <img src="/static/Alphabet/A.png" alt="A" style="max-width:100%; height:100px; object-fit:contain;">
+                <span>A</span>
+            </div>
+            <div class="alphabet-letter" onclick="showLetterReference('B')">
+                <img src="/static/Alphabet/B.png" alt="B" style="max-width:100%; height:100px; object-fit:contain;">
+                <span>B</span>
+            </div>
+            <div class="alphabet-letter" onclick="showLetterReference('C')">
+                <img src="/static/Alphabet/C.png" alt="C" style="max-width:100%; height:100px; object-fit:contain;">
+                <span>C</span>
+            </div>
+            <!-- Repeat for D..Z or add dynamically if you prefer -->
+        </div>
+    </div>
+
+    <script>
+        // Launch Python app endpoint (calls server /launch)
+        async function launchApp() {
+            try {
+                const resp = await fetch('/launch', { method: 'POST' });
+                const data = await resp.json();
+                if (resp.ok && data.started) {
+                    alert('Detection app started (a new console/window should open).');
+                } else {
+                    console.error(data);
+                    alert('Launch failed. Check server terminal for details.');
+                }
+            } catch (err) {
+                alert('Could not launch automatically. Run final_pred.py manually in the venv:\nvenv\\Scripts\\activate\npython final_pred.py');
+                console.error(err);
+            }
+        }
+
+        // Show large reference image in a simple modal-like overlay
+        function showLetterReference(letter) {
+            const imagePath = `/static/Alphabet/${letter}.png`;
+            // create overlay
+            let overlay = document.getElementById('letterOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'letterOverlay';
+                overlay.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:2000;';
+                overlay.onclick = () => document.body.removeChild(overlay);
+                document.body.appendChild(overlay);
+            }
+            overlay.innerHTML = `<div style="background:#fff;padding:20px;border-radius:12px;max-width:90%;max-height:90%;display:flex;flex-direction:column;align-items:center;">
+                <img src="${imagePath}" style="max-width:80vw;max-height:70vh;object-fit:contain;" alt="Sign for ${letter}">
+                <div style="margin-top:10px;font-size:1.2rem;font-weight:bold;">${letter}</div>
+                <div style="margin-top:8px;color:#666;">Click anywhere to close</div>
+            </div>`;
+        }
+    </script>
+
+    <!-- Add any additional scripts or libraries here -->
+</body>
+</html>

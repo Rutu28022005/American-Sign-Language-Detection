@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Detection - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Authentication View -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">Login</button>
+                <button class="tab-btn" data-tab="signup">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form active">
+                <h2>Welcome Back</h2>
+                <form id="login-form-element">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" class="form-input" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required>
+                    </div>
+                    <p id="login-error" class="error-message"></p>
+                    <button type="submit" class="btn btn-primary">Log In</button>
+                </form>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-form" class="auth-form">
+                <h2>Create Account</h2>
+                <form id="signup-form-element">
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" class="form-input" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" class="form-input" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" class="form-input" placeholder="Create a password" required>
+                    </div>
+                    <p id="signup-error" class="error-message"></p>
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="app" class="app hidden">
+        <!-- Top Navbar -->
+        <nav class="navbar">
+            <div class="navbar-content">
+                <h1 class="app-title">Sign Language Detection</h1>
+                <div class="navbar-right">
+                    <span class="user-info" id="user-info"></span>
+                    <button id="logout-btn" class="btn btn-secondary btn-sm">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="app-container">
+            <!-- Left Sidebar -->
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active" data-view="home">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="detection">
+                        <span class="nav-icon">🎯</span>
+                        <span class="nav-text">Sign Detection</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="alphabet">
+                        <span class="nav-icon">🔤</span>
+                        <span class="nav-text">Alphabet Guide</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="generator">
+                        <span class="nav-icon">✨</span>
+                        <span class="nav-text">AI Sign Generator</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="history">
+                        <span class="nav-icon">📜</span>
+                        <span class="nav-text">History</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Home View -->
+                <section id="home-view" class="view active">
+                    <div class="view-header">
+                        <h2>Dashboard</h2>
+                        <p class="subtitle">Welcome to Sign Language Detection</p>
+                    </div>
+                    <div class="videos-section">
+                        <h3 class="videos-section-title">ASL Learning</h3>
+                        <div class="videos-grid" id="videos-grid">
+                            <!-- Video cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="quick-actions">
+                        <h3>Quick Actions</h3>
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="app.showView('detection')">
+                                <span class="action-icon">🎯</span>
+                                <span>Launch Detection</span>
+                            </button>
+                            <button class="action-btn" onclick="app.showView('alphabet')">
+                                <span class="action-icon">🔤</span>
+                                <span>Alphabet Guide</span>
+                            </button>
+                            <button class="action-btn" onclick="app.showView('generator')">
+                                <span class="action-icon">✨</span>
+                                <span>AI Generator</span>
+                            </button>
+                            <button class="action-btn" onclick="app.showView('history')">
+                                <span class="action-icon">📜</span>
+                                <span>View History</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Detection View -->
+                <section id="detection-view" class="view">
+                    <div class="view-header">
+                        <h2>Sign Detection</h2>
+                        <p class="subtitle">Launch the full sign language detection application</p>
+                    </div>
+                    <div class="detection-container">
+                        <div class="launch-section">
+                            <div class="launch-card">
+                                <div class="launch-icon">🎯</div>
+                                <h3>Sign Language Detection Application</h3>
+                                <p class="launch-description">
+                                    Launch the full-featured sign language detection application with real-time camera processing, 
+                                    hand tracking, and advanced ML prediction.
+                                </p>
+                                <div class="launch-features">
+                                    <div class="feature-item">✓ Real-time camera feed</div>
+                                    <div class="feature-item">✓ Hand skeleton visualization</div>
+                                    <div class="feature-item">✓ Advanced ML prediction</div>
+                                    <div class="feature-item">✓ Word building & suggestions</div>
+                                    <div class="feature-item">✓ Text-to-speech support</div>
+                                </div>
+                                <button id="launch-detection-btn" class="btn btn-primary btn-large">
+                                    🚀 Launch Detection App
+                                </button>
+                                <p class="launch-note">
+                                    This will open the full sign language detection application in a new window.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Alphabet Guide View -->
+                <section id="alphabet-view" class="view">
+                    <div class="view-header">
+                        <h2>Alphabet Guide</h2>
+                        <p class="subtitle">Click a card to see the sign!</p>
+                    </div>
+                    <div class="alphabet-container">
+                        <div id="alphabet-grid" class="alphabet-grid">
+                            <!-- Cards populated by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AI Sign Generator View -->
+                <section id="generator-view" class="view">
+                    <div class="view-header">
+                        <h2>AI-Powered Sign Generator</h2>
+                        <p class="subtitle">Enter a word to get an explanation and images of its sign</p>
+                    </div>
+                    <div class="generator-container">
+                        <div class="generator-card">
+                            <div class="generator-input-section">
+                                <input type="text" id="llm-input" placeholder="e.g., hello, family, please" class="form-input generator-input">
+                                <button id="llm-generate-btn" class="btn btn-primary">
+                                    <span>Generate Sign ✨</span>
+                                    <div id="llm-spinner" class="spinner hidden"></div>
+                                </button>
+                            </div>
+                            <div id="llm-output-container" class="generator-output">
+                                <div id="llm-output" class="llm-output-text">
+                                    <p class="text-center text-gray-500">Your sign language explanation will appear here.</p>
+                                </div>
+                                <div id="llm-image-container" class="llm-image-container">
+                                    <!-- Image and Fingerspelling will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- History View -->
+                <section id="history-view" class="view">
+                    <div class="view-header">
+                        <h2>History</h2>
+                        <p class="subtitle">View all your searched words and detected signs</p>
+                    </div>
+                    <div class="history-container">
+                        <div class="history-controls">
+                            <button id="refresh-history-btn" class="btn btn-secondary">Refresh</button>
+                        </div>
+                        <div id="history-list" class="history-list">
+                            <div class="loading-state">Loading history...</div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
